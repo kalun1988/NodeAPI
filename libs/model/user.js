@@ -6,7 +6,7 @@ var mongoose = require('mongoose'),
 	User = new Schema({
 		username: {
 			type: String,
-			unique: true,
+			// unique: true,
 			required: true
 		},
 		hashedPassword: {
@@ -20,7 +20,13 @@ var mongoose = require('mongoose'),
 		created: {
 			type: Date,
 			default: Date.now
-		}
+		},
+	    weibo           : {
+	        id           : String,
+	        token        : String,
+	        name         : String,
+	        picture      : String
+	    }
 	});
 
 User.methods.encryptPassword = function(password) {
