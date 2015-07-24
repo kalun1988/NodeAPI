@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var libs = process.cwd() + '/libs/';
+var config = require(libs + 'config');
 
 // AccessToken
 var AccessToken = new Schema({
@@ -21,7 +23,10 @@ var AccessToken = new Schema({
     
     created: {
         type: Date,
-        default: Date.now
+        default: Date.now,
+      index: {
+        expireAfterSeconds: config.get('security:tokenLife')
+      }
     }
 });
 

@@ -21,12 +21,7 @@ var mongoose = require('mongoose'),
 			type: Date,
 			default: Date.now
 		},
-	    weibo           : {
-	        id           : String,
-	        token        : String,
-	        name         : String,
-	        picture      : String
-	    }
+	    social:  Object
 	});
 
 User.methods.encryptPassword = function(password) {

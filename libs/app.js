@@ -9,6 +9,7 @@ var session      = require('express-session');
 
 var libs = process.cwd() + '/libs/';
 require(libs + 'auth/auth');
+var authUser  = require(libs + 'auth/user');
 
 var config = require('./config');
 var log = require('./log')(module);
@@ -36,19 +37,36 @@ app.use('/', api);
 app.use('/api', api);
 app.use('/api/users', users);
 app.use('/api/articles', articles);
-app.use('/api/oauth/token', oauth2.token);
 
+
+//register or login to HeHa
+app.use('/api/oauth/token',[function(req, res, next) {
+    authUser.registerOrLogin(req, res, next); 
+},oauth2.token]);   //get accessToken by HeHa username and password (in req.body.username, req.body.password)
+// app.use('/api/oauth/token', oauth2.token);
+app.use('/api/oauth/refresh',oauth2.token);   //get accessToken by HeHa username and password (in req.body.username, req.body.password)
 
 
 
 app.get('/auth/weibo', passport.authenticate('sina', { scope : ['profile', 'email'] }));
 
 // the callback after weibo has authenticated the user
+// app.get('/auth/weibo/callback',
+//     passport.authenticate('sina', {
+//         successRedirect : '/profile',
+//         failureRedirect : '/fail'
+//     }));
+
 app.get('/auth/weibo/callback',
-    passport.authenticate('sina', {
-        successRedirect : '/profile',
-        failureRedirect : '/fail'
-    }));
+    passport.authorize('sina'),function(req, res){
+        console.log("xxx");
+        app.use(oauth2.token);
+        //Not yet ready
+        //mobile app use weibo SDK then pass profile value to gateway.
+    });
+
+
+
 app.get('/connect/weibo', passport.authorize('sina', { scope : ['profile', 'email'] }));
 
 // the callback after weibo has authorized the user

@@ -11,6 +11,8 @@ var db = require(libs + 'db/mongoose');
 var User = require(libs + 'model/user');
 var AccessToken = require(libs + 'model/accessToken');
 var RefreshToken = require(libs + 'model/refreshToken');
+var authUser  = require(libs + 'auth/user');
+var test;
 
 // create OAuth 2.0 server
 var aserver = oauth2orize.createServer();
@@ -24,7 +26,6 @@ var errFn = function (cb, err) {
 
 // Destroys any old tokens and generates a new access and refresh token
 var generateTokens = function (data, done) {
-
 	// curries in `done` callback so we don't need to pass it
     var errorHandler = errFn.bind(undefined, done), 
 	    refreshToken,
@@ -37,7 +38,6 @@ var generateTokens = function (data, done) {
 
     tokenValue = crypto.randomBytes(32).toString('hex');
     refreshTokenValue = crypto.randomBytes(32).toString('hex');
-
     data.token = tokenValue;
     token = new AccessToken(data);
 
@@ -48,19 +48,20 @@ var generateTokens = function (data, done) {
 
     token.save(function (err) {
     	if (err) {
-			
 			log.error(err);
     		return done(err); 
     	}
     	done(null, tokenValue, refreshTokenValue, { 
-    		'expires_in': config.get('security:tokenLife') 
+    		'expires_in': config.get('security:tokenLife'),
+    		'uid': data.userId,
+    		'social': global.current_user?global.current_user.social:"",
     	});
     });
 };
 
+
 // Exchange username & password for access token.
 aserver.exchange(oauth2orize.exchange.password(function(client, username, password, scope, done) {
-	
 	User.findOne({ username: username }, function(err, user) {
 		
 		if (err) { 
@@ -70,12 +71,10 @@ aserver.exchange(oauth2orize.exchange.password(function(client, username, passwo
 		if (!user || !user.checkPassword(password)) {
 			return done(null, false);
 		}
-
 		var model = { 
 			userId: user.userId, 
 			clientId: client.clientId 
 		};
-
 		generateTokens(model, done);
 	});
 
@@ -83,16 +82,20 @@ aserver.exchange(oauth2orize.exchange.password(function(client, username, passwo
 
 // Exchange refreshToken for access token.
 aserver.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken, scope, done) {
-
+	console.log('a');
 	RefreshToken.findOne({ token: refreshToken, clientId: client.clientId }, function(err, token) {
+	console.log('b');
 		if (err) { 
+	console.log('c');
 			return done(err); 
 		}
 
 		if (!token) { 
+	console.log('d');
 			return done(null, false); 
 		}
 
+	console.log('e');
 		User.findById(token.userId, function(err, user) {
 			if (err) { return done(err); }
 			if (!user) { return done(null, false); }
@@ -106,7 +109,6 @@ aserver.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken
 		});
 	});
 }));
-
 // token endpoint
 //
 // `token` middleware handles client requests to exchange authorization grants

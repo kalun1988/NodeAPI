@@ -6,11 +6,22 @@ var log = require(libs + 'log')(module);
 var db = require(libs + 'db/mongoose');
 var config = require(libs + 'config');
 
+var Config = require(libs + 'model/config');
 var User = require(libs + 'model/user');
 var Client = require(libs + 'model/client');
 var AccessToken = require(libs + 'model/accessToken');
 var RefreshToken = require(libs + 'model/refreshToken');
 
+    // var config = new Config({ 
+    //     social: "test"
+    // });
+    // config.save(function(err, user) {
+    //     if(!err) {
+    //         // log.info("New config - %s:%s", user.username, user.password);
+    //     }else {
+    //         return log.error(err);
+    //     }
+    // });
 User.remove({}, function(err) {
     var user = new User({ 
         username: config.get("default:user:username"), 

@@ -14,7 +14,7 @@ var Client = require(libs + 'model/client');
 var AccessToken = require(libs + 'model/accessToken');
 var RefreshToken = require(libs + 'model/refreshToken');
 
-var Weibo = require(libs + 'model/weibo');
+var Social = require(libs + 'model/social');
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -77,19 +77,19 @@ passport.use(new BearerStrategy(
             }
 
             if (!token) { 
-            	return done(null, false); 
+            	return done(null, { error: 'invaild_or_expiried_accesstoken' }); 
             }
+            //ttl changed to handle by MongoDB, by adding index expireAfterSeconds in accessToken model
+            // if( Math.round((Date.now()-token.created)/1000) > config.get('security:tokenLife') ) {
 
-            if( Math.round((Date.now()-token.created)/1000) > config.get('security:tokenLife') ) {
+            //     AccessToken.remove({ token: accessToken }, function (err) {
+            //         if (err) {
+            //         	return done(err);
+            //         } 
+            //     });
 
-                AccessToken.remove({ token: accessToken }, function (err) {
-                    if (err) {
-                    	return done(err);
-                    } 
-                });
-
-                return done(null, false, { message: 'Token expired' });
-            }
+            //     return done(null, false, { message: 'Token expired' });
+            // }
 
             User.findById(token.userId, function(err, user) {
             
@@ -98,7 +98,7 @@ passport.use(new BearerStrategy(
                 }
 
                 if (!user) { 
-                	return done(null, false, { message: 'Unknown user' }); 
+                	return done(null,{ error: 'unknown_user' }); 
                 }
 
                 var info = { scope: '*' };
@@ -108,20 +108,24 @@ passport.use(new BearerStrategy(
     }
 ));
 
+//start of register heha
+
+//end of register heha
+
+
   passport.use(new SinaStrategy({
 
-        clientID        : '2250432332',
-        clientSecret    : '5de392ba0d145bfb02e98aa55dec4926',
-        callbackURL     : 'http://10.16.88.183:1337/auth/weibo/callback',
+        clientID        : config.get('social:weibo:clientId'),
+        clientSecret    : config.get('social:weibo:clientSecret'),
+        callbackURL     : config.get('social:weibo:callbackURL'),
         passReqToCallback : true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
 
     },
     function(req, token, refreshToken, profile, done) {
-        console.log('refreshToken'+refreshToken);
         // asynchronous
         process.nextTick(function() {
             // check if the user is already logged in
-            User.findOne({ 'weibo.id' : profile.id }, function(err, user) {
+            User.findOne({ 'social.weibo.id' : profile.id }, function(err, user) {
                 if (err)
                     return done(err);
                 if (user) {
@@ -145,20 +149,21 @@ passport.use(new BearerStrategy(
 
     }));
     function createAndSaveRaw(profile, token){
-        Weibo.findOne({ 'profile.id' : profile.id }, function(err, weibo) {
+        Social.findOne({ 'profile.id' : profile.id }, function(err, social) {
             // if (err)
             //     return done(err);
-            if (weibo) {
-                weibo.profile = profile;
-                weibo.save(function(err) {
+            if (social) {
+                social.profile = profile;
+                social.save(function(err) {
                     // if (err)
                     //     return done(err);
                     // done(profile, token, done)
                 });
             } else {
-                var newWeibo          = new Weibo();
-                newWeibo.profile = profile;
-                newWeibo.save(function(err) {
+                var newSocial          = new Social();
+                newSocial.type = "weibo";
+                newSocial.profile = profile;
+                newSocial.save(function(err) {
                     // if (err)
                     //     return done(err);
                     // done(profile, token, done)
@@ -171,12 +176,14 @@ passport.use(new BearerStrategy(
     function saveUser(user, profile, token, done){
         user.username="weibo"+profile.id;
         user.password="weibo"+profile.id;
-        user.weibo={
+        var social={};
+        social.weibo={
                 id:profile.id,
                 token:token,
                 name:profile.name,
                 picture:profile.profile_image_url
             };
+        user.social=social;
         user.save(function(err) {
             if (err)
                 return done(err);

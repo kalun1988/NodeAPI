@@ -1,18 +1,25 @@
 {
     "port": 1337,
     "security": {
-        "tokenLife" : 3600
+        "tokenLife" : 30
     },
     "mongoose": {
         "uri": "mongodb://localhost/apiDB"
+    },
+    "social": {
+        "weibo": {
+            "clientId":"2250432332",
+            "clientSecret":"5de392ba0d145bfb02e98aa55dec4926",
+            "callbackURL":"http://172.52.6.40:1337/auth/weibo/callback"
+        }
     },
     "default": {
         "api": {
             "version" : "v1"
         },
         "user": {
-            "username": "myapi",
-            "password": "abc1234"
+            "username": "heha-weibo",
+            "password": "heha-weibo"
         },
         "client": {
             "name": "Android API v1",
