@@ -1,7 +1,7 @@
 {
     "port": 1337,
     "security": {
-        "tokenLife" : 30
+        "tokenLife" : 3600000
     },
     "mongoose": {
         "uri": "mongodb://localhost/apiDB"

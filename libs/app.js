@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
 var methodOverride = require('method-override');
+var restful = require('node-restful');
 var flash    = require('connect-flash');
 var session      = require('express-session');
 
@@ -22,8 +23,9 @@ var articles = require('./routes/articles');
 var app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({'extended':'true'}));
 app.use(cookieParser());
+app.use(bodyParser.json({type:'application/vnd.api+json'}));
 app.use(methodOverride());
 
 
@@ -36,16 +38,15 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 app.use('/', api);
 app.use('/api', api);
 app.use('/api/users', users);
-app.use('/api/articles', articles);
+
 
 
 //register or login to HeHa
 app.use('/api/oauth/token',[function(req, res, next) {
     authUser.registerOrLogin(req, res, next); 
 },oauth2.token]);   //get accessToken by HeHa username and password (in req.body.username, req.body.password)
-// app.use('/api/oauth/token', oauth2.token);
-app.use('/api/oauth/refresh',oauth2.token);   //get accessToken by HeHa username and password (in req.body.username, req.body.password)
-
+//use refreshToken to get an new accessToken
+app.use('/api/oauth/refresh',oauth2.token);  
 
 
 app.get('/auth/weibo', passport.authenticate('sina', { scope : ['profile', 'email'] }));

@@ -1,24 +1,19 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-
 var libs = process.cwd() + '/libs/';
-
-var db = require(libs + 'db/mongoose');
-
-router.get('/info', passport.authenticate('bearer', { session: false }),
-    function(req, res) {
-        // req.authInfo is set using the `info` argument supplied by
-        // `BearerStrategy`.  It is typically used to indicate scope of the token,
-        // and used in access control checks.  For illustrative purposes, this
-        // example simply returns the scope in the response.
-        res.json({ 
-        	user_id: req.user.userId, 
-        	name: req.user.username, 
-            scope: req.authInfo.scope,
-        	error: req.user.error,
+var User = require(libs + 'model/user');
+User.before('get', function(req, res, next) {
+  passport.authenticate('bearer', function(err, user, info) {
+    if(!user.error){
+        next();
+    }else{
+        res.json({
+            error:user.error
         });
     }
-);
-
+  })(req, res, next);
+});
+User.register(router, '/');
+//replace original NODEAPI by NODE RESTFUL API with passport
 module.exports = router;

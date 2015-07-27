@@ -1,4 +1,5 @@
-var mongoose = require('mongoose'),
+var restful = require('node-restful');
+var mongoose = restful.mongoose,
 	crypto = require('crypto'),
 
 	Schema = mongoose.Schema,
@@ -48,4 +49,5 @@ User.methods.checkPassword = function(password) {
 	return this.encryptPassword(password) === this.hashedPassword;
 };
 
-module.exports = mongoose.model('User', User);
+// module.exports = mongoose.model('User', User);
+module.exports = restful.model('User', User).methods(['get', 'post', 'put', 'delete']);
