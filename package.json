@@ -1,5 +1,5 @@
 {
-  "name": "NodeAPI",
+  "name": "nodeapi",
   "version": "1.0.0",
   "author": "Evgeny Aleksandrov",
   "description": "Simple example of RESTful API with Node.js and passport",
@@ -23,7 +23,9 @@
     "passport-http-bearer": "^1.0.x",
     "passport-oauth2-client-password": "^0.1.x",
     "passport-sina": "^0.1.0",
-    "winston": "^0.8.x"
+    "winston": "^0.8.x",
+    "connect-flash": "^0.1.1",
+    "node-restful": "^0.2.1"
   },
   "jshintConfig": {
     "curly": true,
@@ -46,5 +48,15 @@
     "browser": true,
     "node": true
   },
-  "license": "MIT"
+  "license": "MIT",
+  "main": "generateData.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kalun1988/NodeAPI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kalun1988/NodeAPI/issues"
+  },
+  "homepage": "https://github.com/kalun1988/NodeAPI#readme"
 }

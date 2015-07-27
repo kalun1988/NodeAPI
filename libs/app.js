@@ -37,7 +37,7 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 
 app.use('/', api);
 app.use('/api', api);
-app.use('/api/users', users);
+app.use('/api/v1/members', users);
 
 
 

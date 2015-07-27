@@ -18,8 +18,15 @@
             "version" : "v1"
         },
         "user": {
-            "username": "heha-weibo",
-            "password": "heha-weibo"
+            "username": "heha",
+            "password": "heha",
+            "social": {
+            "weibo": {
+                "platform": "weibo",
+                "uid": 1947261240,
+                "picture": "http://tp1.sinaimg.cn/1947261240/50/5732080843/1"
+            }
+        }
         },
         "client": {
             "name": "Android API v1",
